@@ -12,7 +12,9 @@ body{font-family:'Segoe UI',Hiragino Sans,'Helvetica Neue',sans-serif;background
 .header h1{font-size:1.4rem;font-weight:800;margin-bottom:4px;letter-spacing:.02em}
 .header p{font-size:.8rem;opacity:.8}
 .wrap{max-width:820px;margin:0 auto;padding:16px}
-.card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 1px 6px rgba(0,0,0,.08);margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 1px 6px rgba(0,0,0,.08)}
 .card-title{font-size:.85rem;font-weight:800;color:#2b6cb0;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #ebf8ff;display:flex;align-items:center;gap:6px}
 .field{margin-bottom:12px}
 label{display:block;font-size:.78rem;font-weight:700;color:#4a5568;margin-bottom:4px}
@@ -25,12 +27,11 @@ input[readonly]:focus{border-color:#e2e8f0;box-shadow:none}
 .hint{font-size:.72rem;color:#a0aec0;margin-top:3px}
 .computed{background:#ebf8ff;border:1.5px solid #90cdf4;border-radius:7px;padding:8px 12px;font-size:.9rem;font-weight:700;color:#2b6cb0;min-height:36px;display:flex;align-items:center}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .toggle-btn{display:flex;border:1.5px solid #e2e8f0;border-radius:8px;overflow:hidden}
 .toggle-btn button{flex:1;padding:8px;border:none;cursor:pointer;font-size:.85rem;font-weight:700;transition:.15s}
 .toggle-btn button.active{background:#2b6cb0;color:#fff}
 .toggle-btn button:not(.active){background:#f7fafc;color:#4a5568}
-.calc-btn{width:100%;padding:13px;background:linear-gradient(135deg,#2b6cb0,#2c7a7b);color:#fff;border:none;border-radius:9px;font-size:1rem;font-weight:800;cursor:pointer;letter-spacing:.03em;transition:.2s;box-shadow:0 2px 8px rgba(43,108,176,.3)}
+.calc-btn{width:100%;padding:13px;background:linear-gradient(135deg,#2b6cb0,#2c7a7b);color:#fff;border:none;border-radius:9px;font-size:1rem;font-weight:800;cursor:pointer;margin-top:4px;letter-spacing:.03em;transition:.2s;box-shadow:0 2px 8px rgba(43,108,176,.3)}
 .calc-btn:hover{opacity:.92;transform:translateY(-1px)}
 .result-wrap{margin-top:16px}
 .status-bar{border-radius:10px 10px 0 0;padding:14px 18px;display:flex;align-items:center;gap:10px}
@@ -73,127 +74,125 @@ input[readonly]:focus{border-color:#e2e8f0;box-shadow:none}
 </div>
 <div class="wrap">
   <p class="req-note">* は必須入力項目です</p>
-
-  <!-- ① 最低賃金 -->
-  <div class="card">
-    <div class="card-title">🏛 ① 最低賃金</div>
-    <div class="row2">
-      <div class="field">
-        <label class="req">都道府県</label>
-        <div style="position:relative">
-          <input type="text" id="pref-input" placeholder="都道府県を入力または選択..." autocomplete="off"
-            oninput="filterPrefs()" onfocus="showDropdown()" onblur="setTimeout(hideDropdown,150)">
-          <div id="pref-dropdown" style="display:none;position:absolute;z-index:100;width:100%;max-height:220px;overflow-y:auto;background:#fff;border:1.5px solid #3182ce;border-top:none;border-radius:0 0 8px 8px;box-shadow:0 4px 12px rgba(0,0,0,.12)"></div>
+  <div class="grid">
+    <!-- 左列 -->
+    <div>
+      <!-- 最低賃金 -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">🏛 最低賃金</div>
+        <div class="field">
+          <label class="req">都道府県</label>
+          <div style="position:relative">
+            <input type="text" id="pref-input" placeholder="都道府県を入力または選択..." autocomplete="off"
+              oninput="filterPrefs()" onfocus="showDropdown()" onblur="setTimeout(hideDropdown,150)">
+            <div id="pref-dropdown" style="display:none;position:absolute;z-index:100;width:100%;max-height:220px;overflow-y:auto;background:#fff;border:1.5px solid #3182ce;border-top:none;border-radius:0 0 8px 8px;box-shadow:0 4px 12px rgba(0,0,0,.12)"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>地域の最低賃金（時給）</label>
+          <input type="number" id="minwage" placeholder="都道府県を選択すると自動入力" readonly>
+          <div class="hint">都道府県を選ぶと自動反映されます（令和7年度）</div>
         </div>
       </div>
-      <div class="field">
-        <label>地域の最低賃金（時給）</label>
-        <input type="number" id="minwage" placeholder="都道府県を選択すると自動入力" readonly>
-        <div class="hint">都道府県を選ぶと自動反映（令和7年度）</div>
+
+      <!-- 所定労働時間 -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">📅 月の所定労働時間を算出</div>
+        <div class="row2">
+          <div class="field">
+            <label class="req">1日の所定労働時間</label>
+            <input type="number" id="daily-h" placeholder="例: 8" step="0.5" oninput="calcWorkHours()">
+          </div>
+          <div class="field">
+            <label class="req">週休日数</label>
+            <input type="number" id="weekly-off" placeholder="例: 2" step="0.5" min="0" max="6" oninput="calcWorkHours()">
+            <div class="hint">0.5刻み可（隔週土曜→1.5）</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>月の所定労働時間（自動 or 直接入力）</label>
+          <input type="number" id="monthly-h" placeholder="自動入力されます" oninput="calc()">
+          <div class="hint">（365 − 週休日数×52）× 1日労働時間 ÷ 12 で算出</div>
+        </div>
+      </div>
+
+      <!-- 基本給 -->
+      <div class="card">
+        <div class="card-title">💴 月給・基本給</div>
+        <div class="field">
+          <label>固定残業代の扱い</label>
+          <div class="toggle-btn">
+            <button id="btn-excl" class="active" onclick="setMode('excl')">含まない<br><span style="font-size:.7rem;font-weight:400">基本給・固定残業代を別入力</span></button>
+            <button id="btn-incl" onclick="setMode('incl')">含む<br><span style="font-size:.7rem;font-weight:400">月給から基本給を逆算</span></button>
+          </div>
+        </div>
+        <div id="field-base-direct" class="field">
+          <label class="req">基本給（月額）</label>
+          <input type="number" id="base" placeholder="例: 220000" oninput="calc()">
+        </div>
+        <div id="field-total-salary" class="field" style="display:none">
+          <label class="req">月給合計（基本給＋固定残業代）</label>
+          <input type="number" id="total-salary" placeholder="例: 250000" oninput="calcBase()">
+        </div>
+        <div id="field-base-calc" class="field" style="display:none">
+          <label>基本給（逆算：月給 − 固定残業代）</label>
+          <div class="computed" id="base-calc-display">—</div>
+          <div class="hint">最低賃金チェックはこの金額で行います</div>
+        </div>
+        <div class="field">
+          <label>基本給の時間単価（自動）</label>
+          <div class="computed" id="base-hourly">—</div>
+          <div class="hint">基本給 ÷ 月の所定労働時間</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右列 -->
+    <div>
+      <div class="card">
+        <div class="card-title">⏰ 固定残業代の設定</div>
+        <div class="field">
+          <label>固定残業代</label>
+          <div class="toggle-btn" style="max-width:200px">
+            <button id="btn-ot-none" class="active" onclick="setOtMode('none')">なし</button>
+            <button id="btn-ot-has" onclick="setOtMode('has')">あり</button>
+          </div>
+        </div>
+        <div id="ot-fields" style="display:none">
+          <div class="field">
+            <label class="req">固定残業代（月額）</label>
+            <input type="number" id="ot-pay" placeholder="例: 30000" oninput="onOtPayChange()">
+          </div>
+          <div class="field">
+            <label class="req">固定残業時間数</label>
+            <input type="number" id="ot-h" placeholder="例: 20" oninput="calc()">
+            <div class="hint">雇用契約書に記載のみなし残業時間</div>
+          </div>
+          <div class="field">
+            <label>割増率</label>
+            <select id="ot-rate" onchange="calc()">
+              <option value="1.25">× 1.25（法定内残業・通常）</option>
+              <option value="1.35">× 1.35（月60時間超）</option>
+              <option value="1.5">× 1.50（休日労働）</option>
+              <option value="1.6">× 1.60（深夜＋残業）</option>
+            </select>
+          </div>
+          <hr style="border:none;border-top:1px dashed #e2e8f0;margin:10px 0">
+          <div class="card-title" style="margin-bottom:10px">📊 固定残業代の最低必要額（自動計算）</div>
+          <div class="field">
+            <label>法定上必要な最低額</label>
+            <div class="computed" id="required-ot">—</div>
+            <div class="hint">基本給時間単価 × 割増率 × 固定残業時間数</div>
+          </div>
+          <div class="field">
+            <label>差額（設定額 − 必要額）</label>
+            <div class="computed" id="ot-diff">—</div>
+          </div>
+        </div>
+        <button class="calc-btn" onclick="calc()">🔍 適法チェックを実行</button>
       </div>
     </div>
   </div>
-
-  <!-- ② 月の所定労働時間 -->
-  <div class="card">
-    <div class="card-title">📅 ② 月の所定労働時間を算出</div>
-    <div class="row3">
-      <div class="field">
-        <label class="req">1日の所定労働時間</label>
-        <input type="number" id="daily-h" placeholder="例: 8" step="0.5" oninput="calcWorkHours()">
-      </div>
-      <div class="field">
-        <label class="req">週休日数</label>
-        <input type="number" id="weekly-off" placeholder="例: 2" step="0.5" min="0" max="6" oninput="calcWorkHours()">
-        <div class="hint">0.5刻み可（隔週土曜→1.5）</div>
-      </div>
-      <div class="field">
-        <label>月の所定労働時間（自動 or 直接入力）</label>
-        <input type="number" id="monthly-h" placeholder="自動入力されます" oninput="calc()">
-        <div class="hint">（365−週休×52）×1日労働時間÷12</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ③ 固定残業代 -->
-  <div class="card">
-    <div class="card-title">⏰ ③ 固定残業代の設定</div>
-    <div class="field">
-      <label>固定残業代</label>
-      <div class="toggle-btn" style="max-width:200px">
-        <button id="btn-ot-none" class="active" onclick="setOtMode('none')">なし</button>
-        <button id="btn-ot-has" onclick="setOtMode('has')">あり</button>
-      </div>
-    </div>
-    <div id="ot-fields" style="display:none">
-      <div class="row3">
-        <div class="field">
-          <label class="req">固定残業代（月額）</label>
-          <input type="number" id="ot-pay" placeholder="例: 30000" oninput="onOtPayChange()">
-        </div>
-        <div class="field">
-          <label class="req">固定残業時間数</label>
-          <input type="number" id="ot-h" placeholder="例: 20" oninput="calc()">
-          <div class="hint">みなし残業時間</div>
-        </div>
-        <div class="field">
-          <label>割増率</label>
-          <select id="ot-rate" onchange="calc()">
-            <option value="1.25">× 1.25（通常残業）</option>
-            <option value="1.35">× 1.35（月60時間超）</option>
-            <option value="1.5">× 1.50（休日労働）</option>
-            <option value="1.6">× 1.60（深夜＋残業）</option>
-          </select>
-        </div>
-      </div>
-      <div class="row2">
-        <div class="field">
-          <label>法定上必要な最低額（自動）</label>
-          <div class="computed" id="required-ot">—</div>
-          <div class="hint">基本給時間単価 × 割増率 × 固定残業時間数</div>
-        </div>
-        <div class="field">
-          <label>差額（設定額 − 必要額）（自動）</label>
-          <div class="computed" id="ot-diff">—</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ④ 月給・基本給 -->
-  <div class="card">
-    <div class="card-title">💴 ④ 月給・基本給</div>
-    <div class="field">
-      <label>固定残業代の扱い</label>
-      <div class="toggle-btn" style="max-width:360px">
-        <button id="btn-excl" class="active" onclick="setMode('excl')">含まない｜基本給・固定残業代を別入力</button>
-        <button id="btn-incl" onclick="setMode('incl')">含む｜月給から基本給を逆算</button>
-      </div>
-    </div>
-    <div class="row2">
-      <div id="field-base-direct" class="field">
-        <label class="req">基本給（月額）</label>
-        <input type="number" id="base" placeholder="例: 220000" oninput="calc()">
-      </div>
-      <div id="field-total-salary" class="field" style="display:none">
-        <label class="req">月給合計（基本給＋固定残業代）</label>
-        <input type="number" id="total-salary" placeholder="例: 250000" oninput="calcBase()">
-      </div>
-      <div id="field-base-calc" class="field" style="display:none">
-        <label>基本給（逆算：月給 − 固定残業代）</label>
-        <div class="computed" id="base-calc-display">—</div>
-        <div class="hint">最低賃金チェックはこの金額で行います</div>
-      </div>
-      <div class="field">
-        <label>基本給の時間単価（自動）</label>
-        <div class="computed" id="base-hourly">—</div>
-        <div class="hint">基本給 ÷ 月の所定労働時間</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ⑤ チェック実行 -->
-  <button class="calc-btn" onclick="calc()">🔍 適法チェックを実行</button>
 
   <div class="result-wrap" id="result" style="display:none"></div>
 
