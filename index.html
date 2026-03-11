@@ -260,16 +260,15 @@ function setMode(m){
   document.getElementById('field-base-direct').style.display  = m==='incl' ? 'none' : '';
   document.getElementById('field-total-salary').style.display = m==='incl' ? '' : 'none';
   document.getElementById('field-base-calc').style.display    = m==='incl' ? '' : 'none';
+  // 含む：基本給の値を月給合計欄にコピー（上書き）
   if(m==='incl'){
-    const base=parseFloat(document.getElementById('base').value)||0;
-    const otPay=parseFloat(document.getElementById('ot-pay').value)||0;
-    if(base>0 && !document.getElementById('total-salary').value)
-      document.getElementById('total-salary').value = base+otPay || '';
-  } else {
-    const total=parseFloat(document.getElementById('total-salary').value)||0;
-    const otPay=parseFloat(document.getElementById('ot-pay').value)||0;
-    if(total>0 && !document.getElementById('base').value)
-      document.getElementById('base').value = total-otPay>0 ? total-otPay : '';
+    const base = document.getElementById('base').value;
+    if(base) document.getElementById('total-salary').value = base;
+  }
+  // 含まない：月給合計の値を基本給欄にコピー（上書き）
+  else {
+    const total = document.getElementById('total-salary').value;
+    if(total) document.getElementById('base').value = total;
   }
   calcBase();
 }
